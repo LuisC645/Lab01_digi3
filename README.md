@@ -1,6 +1,6 @@
 # Proyecto: Juego de Reacción en Raspberry Pi Pico (SDK)
 
-Este documento sirve como *README* y guía de desarrollo paso a paso. La idea es avanzar por *etapas* claras, con un "Definition of Done" (DoD) en cada una.
+Este documento es una guía de desarrollo paso a paso. La idea es avanzar por *etapas* claras, con un "Definition of Done" (DoD) en cada una.
 
 ---
 
