@@ -2,55 +2,60 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
-// LED1 y su botón
-#define LED1 16   // GP16 (pin 21)
-#define BTN1 14   // GP14 (pin 19)
+// LED – Botón pares
+#define LED1 16   // GP16
+#define BTN1 14   // GP14
 
-// LED2 y su botón
-#define LED2 17   // GP17 (pin 22)
-#define BTN2 13   // GP12 (pin 17)
+#define LED2 17   // GP17
+#define BTN2 13   // GP12
 
-// Botones con pull-up: presionado = 0
-static inline bool btn1_pressed(void){ return !gpio_get(BTN1); }
-static inline bool btn2_pressed(void){ return !gpio_get(BTN2); }
+#define LED3 18   // GP18
+#define BTN3 15   // GP15
+
+// Helpers: botones con pull-up, presionado = 0
+static inline bool btn_pressed(int gpio) {
+    return !gpio_get(gpio);
+}
 
 int main(void) {
     stdio_init_all();
 
-    // LEDs
+    // Inicializa LEDs
     gpio_init(LED1); gpio_set_dir(LED1, GPIO_OUT); gpio_put(LED1, 0);
     gpio_init(LED2); gpio_set_dir(LED2, GPIO_OUT); gpio_put(LED2, 0);
+    gpio_init(LED3); gpio_set_dir(LED3, GPIO_OUT); gpio_put(LED3, 0);
 
-    // Botones (pull-up interno)
+    // Inicializa botones
     gpio_init(BTN1); gpio_set_dir(BTN1, GPIO_IN); gpio_pull_up(BTN1);
     gpio_init(BTN2); gpio_set_dir(BTN2, GPIO_IN); gpio_pull_up(BTN2);
+    gpio_init(BTN3); gpio_set_dir(BTN3, GPIO_IN); gpio_pull_up(BTN3);
 
     while (true) {
-        // Pequeña “señal” de inicio
-        gpio_put(LED1, 1); gpio_put(LED2, 1); sleep_ms(150);
-        gpio_put(LED1, 0); gpio_put(LED2, 0); sleep_ms(350);
+        // Breve señal de inicio
+        gpio_put(LED1, 1); gpio_put(LED2, 1); gpio_put(LED3, 1); sleep_ms(100);
+        gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 0); sleep_ms(200);
+        gpio_put(LED1, 1); gpio_put(LED2, 1); gpio_put(LED3, 1); sleep_ms(100);
+        gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 0); sleep_ms(200);
+        gpio_put(LED1, 1); gpio_put(LED2, 1); gpio_put(LED3, 1); sleep_ms(100);
+        gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 0); sleep_ms(200);
 
         // Espera aleatoria 1–5 s
         uint32_t wait_ms = 1000 + (time_us_32() % 4000);
         sleep_ms(wait_ms);
 
-        // Elegir LED aleatorio (0 -> LED1, 1 -> LED2)
-        int choice = time_us_32() & 1;
-        int led_pin   = (choice == 0) ? LED1 : LED2;
-        int expectBtn = (choice == 0) ? BTN1 : BTN2;
+        // Selecciona LED aleatorio
+        int choice = time_us_32() % 3;  
+        int led_pin, btn_pin;
+        if (choice == 0) { led_pin = LED1; btn_pin = BTN1; }
+        else if (choice == 1) { led_pin = LED2; btn_pin = BTN2; }
+        else { led_pin = LED3; btn_pin = BTN3; }
 
-        // Enciende el LED seleccionado
+        // Enciende LED elegido y arranca cronómetro
         gpio_put(led_pin, 1);
         absolute_time_t t0 = get_absolute_time();
 
-        // Esperar hasta que se presione SOLO el botón asociado
-        while (true) {
-            // Si se presiona el botón correcto: medir y salir
-            if (expectBtn == BTN1 && btn1_pressed()) break;
-            if (expectBtn == BTN2 && btn2_pressed()) break;
-
-            // Si se presiona el botón incorrecto: se ignora (no cuenta)
-            // (no hacemos nada, seguimos esperando)
+        // Espera hasta que el botón asociado se presione
+        while (!btn_pressed(btn_pin)) {
             tight_loop_contents();
         }
 
@@ -60,13 +65,12 @@ int main(void) {
         // Apaga LED y muestra resultado
         gpio_put(led_pin, 0);
         printf("LED%d -> Reaction: %lld.%03lld s\n",
-               (choice == 0) ? 1 : 2,
-               elapsed_ms/1000, elapsed_ms%1000);
+               choice+1, elapsed_ms/1000, elapsed_ms%1000);
 
-        // Esperar a que se suelte el botón antes de la siguiente ronda (simple)
-        // (para no capturar una pulsación “arrastrada”)
-        if (expectBtn == BTN1) { while (btn1_pressed()) tight_loop_contents(); }
-        else                   { while (btn2_pressed()) tight_loop_contents(); }
+        // Esperar a que se suelte antes de otra ronda
+        while (btn_pressed(btn_pin)) {
+            tight_loop_contents();
+        }
 
         sleep_ms(600);
     }
