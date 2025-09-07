@@ -1,36 +1,28 @@
-#include <stdio.h>
 #include "pico/stdlib.h"
 
-// ====== CONFIGURA AQUÍ TUS PINES ======
-static const uint LEDS[3]     = {2, 3, 4};     // 3 LEDs
-static const uint BTN_LED[3]  = {5, 6, 7};     // 3 botones (uno por LED)
-static const uint BTN_START   = 8;             // botón de inicio
+#define LED_PIN 16
+#define BTN_PIN 14
 
-// Si tus botones van a GND -> pull-up y lectura invertida (!gpio_get(pin))
-static inline bool btn_pressed(uint pin) {
-    // Antirrebote súper simple
-    static absolute_time_t last[32];
-    bool pressed = !gpio_get(pin);
-    if (pressed) {
-        absolute_time_t now = get_absolute_time();
-        if (to_ms_since_boot(now) - to_ms_since_boot(last[pin]) > 50) {
-            sleep_ms(5);
-            bool still = !gpio_get(pin);
-            if (still) {
-                last[pin] = now;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-int main()
-{
+int main() {
+    // Inicializa stdio si usas printf (opcional aquí)
     stdio_init_all();
 
+    // Configuración LED
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+
+    // Configuración botón con pull-up interno
+    gpio_init(BTN_PIN);
+    gpio_set_dir(BTN_PIN, GPIO_IN);
+    gpio_pull_up(BTN_PIN);  // pull-up => el pin está en 1 si no presionas
+
     while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+        // Lee el botón (0 cuando se presiona, 1 cuando está suelto)
+        bool pressed = !gpio_get(BTN_PIN);
+
+        // Enciende LED si se presiona
+        gpio_put(LED_PIN, pressed);
+
+        sleep_ms(20); // pequeño delay para estabilidad
     }
 }
