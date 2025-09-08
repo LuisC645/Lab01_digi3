@@ -1,110 +1,38 @@
-# Proyecto: Juego de Reacción en Raspberry Pi Pico (SDK)
+# Juego de Tiempos de Reacción – Bitácora de Desarrollo
 
-Este documento es una guía de desarrollo paso a paso. La idea es avanzar por *etapas* claras, con un "Definition of Done" (DoD) en cada una.
+## Avances
+- Configuración del proyecto con **SDK de Raspberry Pi Pico** en C.
+- Pruebas iniciales con **un LED y un botón** (GPIO16 y GPIO14).
+- Extensión a **2 LEDs + 2 botones** y luego a **3 LEDs + 3 botones**.
+- Implementación del **flujo básico del juego**:
+  1. Animación de inicio con LEDs.
+  2. Espera aleatoria (1–5 s).
+  3. LED aleatorio se enciende.
+  4. Usuario presiona el botón asociado:
+     - Correcto → mide tiempo de reacción.
+     - Incorrecto → penalización de **+1000 ms**.
+  5. Si pasan **10 s totales** (incluyendo penalizaciones) → se corta la ronda automáticamente.
+- Ajuste de salida por USB serial:
+  - `stdout` configurado **sin buffer** para evitar lag al imprimir.
+  - Impresión inmediata de resultados.
 
----
+## Observaciones
+- Penalizaciones múltiples se acumulan hasta que el tiempo total llega a **9999 ms** (tope).
+- Se detectó “lag” en los `printf`, corregido con `setvbuf(..., _IONBF, 0)` y `stdio_flush()`.
+- Actualmente los botones **no tienen antirrebote**, lo que puede generar penalizaciones extra por ruido mecánico.
 
-## Etapa 0 — Estructura y build “en blanco”
+## Pendientes
+- [ ] **Antirrebote (debounce)** en botones (20–30 ms) para evitar lecturas dobles.
+- [ ] **Display de 7 segmentos (3 dígitos + signo):**
+  - Mostrar tiempos en ms (0–9999).
+  - Multiplexado de los dígitos.
+  - Indicación de penalización.
+- [ ] **Botón de reinicio de juego** dedicado (ya probado con GP25 y/o un tercer botón).
+- [ ] Revisión de detalles finales del documento del laboratorio:
+  - Escenarios de prueba.
+  - Requisitos de entrega (diagrama de conexiones, explicación de código, etc.).
 
-* *Objetivo:* proyecto SDK compila y genera UF2.
-* *Entregable:* reaction.uf2 básico con loop vacío y printf por USB.
-* *Archivos:* CMakeLists.txt, src/main.c.
-
----
-
-## Etapa 1 — Bring-up de GPIO (LEDs y botones)
-
-* *Objetivo:* verificar wiring y lógica de entradas.
-* *Entregable:* LEDs ciclando; lectura de botones por USB.
-* *Archivos:* main.c (init GPIO, pulls, helpers).
-
----
-
-## Etapa 2 — Máquina de estados básica
-
-* *Objetivo:* FSM con IDLE → COUNTDOWN → IDLE.
-* *Entregable:* Secuencia LEDs 111→011→001→000 al presionar START.
-* *Archivos:* main.c (enum estados, switch-case, temporización).
-
----
-
-## Etapa 3 — Módulo 7 segmentos (multiplexado)
-
-* *Objetivo:* motor de display funcionando a \~1 kHz.
-* *Entregable:* visualización estable de “0123”.
-* *Archivos:* sevenseg.h/.c (init, buffer, ISR), main.c (timer repetitivo).
-
----
-
-## Etapa 4 — Formateo de tiempos en display
-
-* *Objetivo:* mostrar S.mmm (segundo y milisegundos).
-* *Entregable:* sevenseg_show_time_ms(ms) convierte 0–9999 ms a 4 dígitos.
-* *Archivos:* sevenseg.c (render), main.c (prueba con valores fijos).
-
----
-
-## Etapa 5 — Ventana aleatoria
-
-* *Objetivo:* espera aleatoria 1–10 s tras el countdown.
-* *Entregable:* transición COUNTDOWN → WAIT_RANDOM → LIT_AND_TIMING.
-* *Archivos:* main.c (PRNG, tiempo objetivo, transición).
-
----
-
-## Etapa 6 — Cronometría de reacción
-
-* *Objetivo:* medir tiempo desde que se enciende LED hasta botón correcto.
-* *Entregable:* display actualiza en vivo; botón correcto congela valor.
-* *Archivos:* main.c (timestamper, elapsed, update a display).
-
----
-
-## Etapa 7 — Penalización por errores
-
-* *Objetivo:* sumar +1000 ms por botón incorrecto.
-* *Entregable:* penalidad visible de inmediato, sin romper el conteo.
-* *Archivos:* main.c (detección de botón no correspondiente, saturación).
-
----
-
-## Etapa 8 — Timeout y reinicio limpio
-
-* *Objetivo:* cancelar a los 10 s sin respuesta.
-* *Entregable:* apaga LED, muestra 0000 breve y vuelve a IDLE.
-* *Archivos:* main.c (comparación con umbral, reset de variables).
-
----
-
-## Etapa 9 — Antirrebote y robustez
-
-* *Objetivo:* evitar múltiples lecturas por una pulsación.
-* *Entregable:* función btn_pressed() o IRQ con filtro.
-* *Archivos:* main.c (debounce/IRQ), posible input.c si se separa.
-
----
-
-## Etapa 10 — Telemetría y limpieza final
-
-* *Objetivo:* pruebas de caja negra y README.
-* *Entregable:* logs útiles (opcionales con #ifdef DEBUG), README con pines, FSM, cómo compilar/cargar y casos de prueba.
-* *Archivos:* README.md, comentarios/Doxygen.
-
----
-
-# Cómo iterar
-
-1. Implementa *una sola etapa*.
-2. Compila y carga el .uf2.
-3. Valida el DoD.
-4. Guarda cambios (commit).
-5. Avanza a la siguiente etapa.
-
----
-
-## Notas finales
-
-* Usa gpio_pull_up() si los botones van a GND.
-* Define en sevenseg.h si tu display es de ánodo o cátodo común.
-* Haz pruebas con casos: respuesta rápida, lenta, con errores y timeout.
-* Documenta wiring y estados al final.
+## Notas rápidas
+- LEDs conectados con resistencias de 220–330 Ω.
+- Botones con **pull-up interno** (presionado = nivel bajo).
+- Código probado en Pico H con monitor serie a **115200 baud**.
