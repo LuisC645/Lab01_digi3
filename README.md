@@ -18,7 +18,7 @@
 
 ## Observaciones
 - Penalizaciones múltiples se acumulan hasta que el tiempo total llega a **9999 ms** (tope).
-- Se detectó “lag” en los `printf`, corregido con `setvbuf(..., _IONBF, 0)` y `stdio_flush()`.
+- Se detectó “lag” en los `printf` -> **no corregido**.
 - Actualmente los botones **no tienen antirrebote**, lo que puede generar penalizaciones extra por ruido mecánico.
 
 ## Pendientes
@@ -27,12 +27,10 @@
   - Mostrar tiempos en ms (0–9999).
   - Multiplexado de los dígitos.
   - Indicación de penalización.
-- [ ] **Botón de reinicio de juego** dedicado (ya probado con GP25 y/o un tercer botón).
-- [ ] Revisión de detalles finales del documento del laboratorio:
+- [ ] **Botón de reinicio de juego** dedicado.
   - Escenarios de prueba.
   - Requisitos de entrega (diagrama de conexiones, explicación de código, etc.).
 
 ## Notas rápidas
-- LEDs conectados con resistencias de 220–330 Ω.
+- LEDs conectados con resistencias de 1k
 - Botones con **pull-up interno** (presionado = nivel bajo).
-- Código probado en Pico H con monitor serie a **115200 baud**.
