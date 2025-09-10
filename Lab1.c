@@ -2,15 +2,18 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+// Display
+#include "display7seg.h"
+
 // LED – Botón pares
-#define LED1 16   // GP16
-#define BTN1 14   // GP14
+#define LED1 11   // GP16
+#define BTN1 20   // GP14
 
-#define LED2 17   // GP17
-#define BTN2 13   // GP13
+#define LED2 12   // GP17
+#define BTN2 18   // GP13
 
-#define LED3 18   // GP18
-#define BTN3 15   // GP15
+#define LED3 13   // GP18
+#define BTN3 19   // GP15
 
 #define MAX_ON_MS 9999         // 10 s
 #define MAX_TOTAL_MS  9999     // tope absoluto: elapsed + penalty
@@ -19,6 +22,7 @@ static inline bool btn_pressed(int gpio) { return !gpio_get(gpio); }
 
 int main(void) {
     stdio_init_all();
+    disp_init();
     setvbuf(stdout, NULL, _IONBF, 0); // sin buffering para evitar lag
 
 
@@ -34,7 +38,7 @@ int main(void) {
     while (true) {
         // Secuencia de inicio
         gpio_put(LED1,1); gpio_put(LED2,0); gpio_put(LED3,0); sleep_ms(100);
-        gpio_put(LED1,0); gpio_put(LED2,1); gpio_put(LED3,0); sleep_ms(100);
+        gpio_put(LED1,0); gpio_put(LED2,1); gpio_put(LED3,0); sleep_ms(100);        
         gpio_put(LED1,0); gpio_put(LED2,0); gpio_put(LED3,1); sleep_ms(100);
         gpio_put(LED1,0); gpio_put(LED2,1); gpio_put(LED3,0); sleep_ms(100);
         gpio_put(LED1,1); gpio_put(LED2,0); gpio_put(LED3,0); sleep_ms(100);
@@ -102,12 +106,12 @@ int main(void) {
             // Apaga LED y muestra resultado
             gpio_put(led_pin, 0);
             if (finished) {
-                printf("LED%d -> Reaction: %lld.%03lld s",
-                    target+1, total_ms/1000, total_ms%1000);
+                printf("LED%d -> Reaction: %lld.%03lld s",target+1, total_ms/1000, total_ms%1000);
+                disp_show_ms_block((int)total_ms, 1000); // 1 segundo en pantalla
             } else {
                 // Timeout (no hubo acierto en 10 s)
-                printf("LED%d -> Timeout: %lld.%03lld s",
-                    target+1, total_ms/1000, total_ms%1000);
+                printf("LED%d -> Timeout: %lld.%03lld s",target+1, total_ms/1000, total_ms%1000);
+                disp_show_ms_block((int)total_ms, 1000);
             }
             if (penalty_ms > 0) {
                 printf(" (penalty +%lld ms)\n", penalty_ms);
