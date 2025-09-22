@@ -20,14 +20,14 @@
 #define RST  22
 
 // ===== Parámetros =====
-#define MAX_ON_MS        10000   // 10 s de ventana para acertar
-#define MAX_TOTAL_MS     9999    // tope que mostramos
-#define PENALTY_INC_MS   1000    // penalización por fallo
+#define MAX_ON_MS        10000   // 10s max
+#define MAX_TOTAL_MS     9999    // max en disp
+#define PENALTY_INC_MS   1000    // penalización
 #define WAIT_MIN_MS      1000
 #define WAIT_MAX_MS      5000
-#define START_BLINK_MS   80
 #define ROUND_PAUSE_MS   600
 #define SCAN_SLEEP_US    250
+
 
 // ===== Utilidad tiempo =====
 static inline int64_t ms_since(absolute_time_t t0) {
@@ -46,25 +46,25 @@ static void leds_off_all(void) {
     gpio_put(LED3, 0);
 }
 
-// ===== RNG sencillo =====
-static uint32_t rng_uniform(uint32_t min_incl, uint32_t max_incl) {
+// ===== Random number =====
+static uint32_t rng(uint32_t min_incl, uint32_t max_incl) {
     uint32_t now = time_us_32();                   // cambia todo el tiempo
     uint32_t span = (max_incl - min_incl + 1u);
     return min_incl + (now % span);
 }
 
-// Espera a que se presione RST mostrando un "latido" con los 3 LEDs.
+// Wait
 static void wait_for_start(void) {
     absolute_time_t t0 = get_absolute_time();
     bool phase = false;
 
     for (;;) {
-        if (btn_pressed(RST)) { 
-            leds_off_all(); 
-            sleep_ms(10); 
-            return; 
+        if (btn_pressed(RST)) {
+            leds_off_all();
+            sleep_ms(10);
+            return;
         }
-        if (ms_since(t0) >= START_BLINK_MS) {
+        if (ms_since(t0) >= 300) {
             t0 = get_absolute_time();
             phase = !phase;
             gpio_put(LED1, phase);
@@ -74,6 +74,32 @@ static void wait_for_start(void) {
         sleep_us(SCAN_SLEEP_US);
     }
 }
+
+// Start sequence
+static void start_sequence(void) {
+    const uint32_t STEP_MS = 400;
+
+    // 000: todos apagados
+    gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 0);
+    sleep_ms(STEP_MS);
+
+    // 111: LED1, LED2, LED3 encendidos
+    gpio_put(LED1, 1); gpio_put(LED2, 1); gpio_put(LED3, 1);
+    sleep_ms(STEP_MS);
+
+    // 011: LED2, LED3 encendidos
+    gpio_put(LED1, 0); gpio_put(LED2, 1); gpio_put(LED3, 1);
+    sleep_ms(STEP_MS);
+
+    // 001: solo LED3 encendido
+    gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 1);
+    sleep_ms(STEP_MS);
+
+    // 000: todos apagados
+    gpio_put(LED1, 0); gpio_put(LED2, 0); gpio_put(LED3, 0);
+    sleep_ms(STEP_MS);
+}
+
 
 int main(void) {
     stdio_init_all();
@@ -100,26 +126,18 @@ int main(void) {
         wait_for_start();
 
         // ===== 2) Secuencia breve =====
-        const uint seq[5] = {0,1,2,1,0};
-        for (int i = 0; i < 5; ++i) {
-            leds_off_all();
-            gpio_put(LEDS[seq[i]], 1);
-            sleep_ms(100);
-
-        }
-        leds_off_all();
-        sleep_ms(100);
+        start_sequence();
 
         bool canceled_round = false;
 
         // ===== 3) Espera aleatoria (cancelable con RST) =====
-        uint32_t wait_ms = rng_uniform(WAIT_MIN_MS, WAIT_MAX_MS);
+        uint32_t wait_ms = rng(WAIT_MIN_MS, WAIT_MAX_MS);
         absolute_time_t t_wait = make_timeout_time_ms(wait_ms);
         while (absolute_time_diff_us(get_absolute_time(), t_wait) > 0) {
-            if (btn_pressed(RST)) { 
-                leds_off_all(); 
-                canceled_round = true; 
-                break; 
+            if (btn_pressed(RST)) {
+                leds_off_all();
+                canceled_round = true;
+                break;
             }
             sleep_us(SCAN_SLEEP_US);
         }
@@ -135,8 +153,8 @@ int main(void) {
             continue; // siguiente ronda
         }
 
-        // ===== 4) Ronda: elegir objetivo, medir tiempo, penalizaciones =====
-        uint target = rng_uniform(0, 2);     // 0..2
+        // ===== 4) Ronda: elegir objetivo, mostrar tiempo en vivo por serial, medir penalizaciones =====
+        uint target = rng(0, 2);     // 0..2
         uint led_pin = LEDS[target];
         gpio_put(led_pin, 1);
         absolute_time_t t0 = get_absolute_time();
@@ -145,25 +163,40 @@ int main(void) {
         int64_t total_ms   = 0;
         bool finished      = false;
 
+        // --- tiempo en vivo por consola ---
+        int64_t last_report_ms = -1000;
+        const  int64_t report_step_ms = 100; // refresco cada 100 ms
+
+        printf("LED%d encendido. Tiempo: 0 ms", (int)target+1);
+
         for (;;) {
             // Cancelación global
-            if (btn_pressed(RST)) { 
-                gpio_put(led_pin, 0); 
-                canceled_round = true; 
-                break; 
+            if (btn_pressed(RST)) {
+                gpio_put(led_pin, 0);
+                canceled_round = true;
+                break;
             }
 
-            // Timeout
+            // Tiempo transcurrido
             int64_t elapsed = ms_since(t0);
+
+            // Timeout
             if (elapsed >= MAX_ON_MS) {
                 total_ms = MAX_ON_MS;
                 finished = false;
+                printf("\rLED%d encendido. Tiempo: %lld ms\n", (int)target+1, (long long)MAX_ON_MS);
                 break;
+            }
+
+            // Mostrar tiempo en vivo (sin penalización) en la misma línea
+            if (elapsed - last_report_ms >= report_step_ms) {
+                last_report_ms = elapsed;
+                printf("\rLED%d encendido. Tiempo: %lld ms", (int)target+1, (long long)elapsed);
+                fflush(stdout);
             }
 
             // Lectura de botones (una por iteración)
             bool pressed = false;
-            // Correctos/incorrectos sin apuntadores
             if (target == 0 && btn_pressed(BTN1)) {
                 pressed = true; total_ms = elapsed + penalty_ms; finished = true;
             } else if (target == 1 && btn_pressed(BTN2)) {
@@ -174,6 +207,11 @@ int main(void) {
                 // Se presionó alguno pero no el correcto
                 pressed = true;
                 penalty_ms += PENALTY_INC_MS;
+
+                // (Opcional) notificar penalización sin romper la línea
+                printf("\rLED%d encendido. Tiempo: %lld ms (+%lld ms penal.)",
+                       (int)target+1, (long long)elapsed, (long long)PENALTY_INC_MS);
+
                 if (elapsed + penalty_ms >= MAX_TOTAL_MS) {
                     total_ms = MAX_TOTAL_MS;
                     finished = false;
@@ -183,8 +221,11 @@ int main(void) {
             if (pressed) {
                 if (finished) {
                     if (total_ms > MAX_TOTAL_MS) total_ms = MAX_TOTAL_MS;
+                    // cerrar la línea en vivo con salto de línea
+                    printf("\rLED%d encendido. Tiempo: %lld ms\n", (int)target+1, (long long)(total_ms - penalty_ms));
                     break;
                 } else if (total_ms == MAX_TOTAL_MS) {
+                    printf("\rLED%d encendido. Tiempo: %lld ms\n", (int)target+1, (long long)(MAX_TOTAL_MS));
                     break;
                 }
             }
@@ -207,7 +248,7 @@ int main(void) {
             continue; // siguiente ronda
         }
 
-        // ===== 5) Mostrar resultado =====
+        // ===== 5) Mostrar resultado final (con penalización aplicada) y en display =====
         if (finished) {
             uint16_t show = (total_ms < 0) ? 0 :
                             (total_ms > MAX_TOTAL_MS ? MAX_TOTAL_MS : (uint16_t)total_ms);
@@ -233,7 +274,6 @@ int main(void) {
             sleep_us(SCAN_SLEEP_US);
         }
         leds_off_all();
-        sleep_ms(300);
-
+        sleep_ms(1000);
     }
 }

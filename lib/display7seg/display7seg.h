@@ -2,29 +2,14 @@
 #include <stdint.h>
 #include <pico/stdlib.h>
 
-/**
- * Inicializa los pines del display de 7 segmentos (4 dígitos).
- * Configura segmentos como salida y dígitos como salida.
- */
+/* Inicializa pines del display (ánodo común, 4 dígitos). */
 void display7seg_init(void);
 
-/**
- * Muestra un número entero (0–9999) en el display.
- * Refresca un ciclo completo de los 4 dígitos (se debe llamar rápido, en loop).
- */
-void display7seg_show_number(uint16_t value);
+/* Carga el buffer con s.mmm a partir de ms (0..9999). */
+void display7seg_set_s_mmm(uint16_t ms);
 
-/**
- * Muestra un valor de tiempo en milisegundos (0–9999 ms).
- * No bloquea, solo carga los dígitos.
- */
-static inline void display7seg_show_ms(uint16_t ms) {
-    display7seg_show_number(ms);
-}
+/* Refresca UN dígito (multiplexado). Llamar muy seguido en los bucles. */
+void display7seg_refresh_once(void);
 
-/**
- * Muestra un valor en milisegundos durante un tiempo fijo (bloqueante).
- * @param ms valor a mostrar (0–9999)
- * @param hold_ms tiempo en ms a mantenerlo visible
- */
+/* Muestra s.mmm de forma bloqueante durante hold_ms. */
 void display7seg_show_ms_block(uint16_t ms, uint16_t hold_ms);
