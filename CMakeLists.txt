@@ -35,7 +35,11 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Lab1 Lab1.c display7seg.c)
+add_executable(Lab1 
+    Lab1.c 
+    lib/display7seg/display7seg.c
+    lib/debounce/debounce.c
+)
 
 pico_set_program_name(Lab1 "Lab1")
 pico_set_program_version(Lab1 "0.1")
