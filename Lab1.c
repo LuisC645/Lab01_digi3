@@ -20,7 +20,7 @@
 #define RST  22
 
 // ===== Parámetros =====
-#define MAX_ON_MS        10000   // 10s max
+#define MAX_ON_MS        5000   // 5s max
 #define MAX_TOTAL_MS     9999    // max en disp
 #define PENALTY_INC_MS   1000    // penalización
 #define WAIT_MIN_MS      1000
@@ -100,7 +100,6 @@ static void start_sequence(void) {
     sleep_ms(STEP_MS);
 }
 
-
 int main(void) {
     stdio_init_all();
     setvbuf(stdout, NULL, _IONBF, 0);
@@ -154,7 +153,7 @@ int main(void) {
         }
 
         // ===== 4) Ronda: elegir objetivo, mostrar tiempo en vivo por serial, medir penalizaciones =====
-        uint target = rng(0, 2);     // 0..2
+        uint target = rng(0, 2);
         uint led_pin = LEDS[target];
         gpio_put(led_pin, 1);
         absolute_time_t t0 = get_absolute_time();
@@ -248,7 +247,9 @@ int main(void) {
             continue; // siguiente ronda
         }
 
-        // ===== 5) Mostrar resultado final (con penalización aplicada) y en display =====
+        // ===== 5) Mostrar resultado final y en display =====
+        bool timed_out = (!finished && (total_ms >= MAX_ON_MS));
+
         if (finished) {
             uint16_t show = (total_ms < 0) ? 0 :
                             (total_ms > MAX_TOTAL_MS ? MAX_TOTAL_MS : (uint16_t)total_ms);
@@ -256,14 +257,18 @@ int main(void) {
             if (penalty_ms > 0) printf(" (penalty +%lld ms)", penalty_ms);
             printf("\n");
             display7seg_show_ms_block(show, 1000);
+        } else if (timed_out) {
+            // TIMEOUT: mostrar 0.000 en el display
+            printf(
+                "LED%d -> Timeout: %d.%03d s\n",
+                (int)target+1, (int)(MAX_ON_MS/1000), (int)(MAX_ON_MS%1000)
+            );
+            display7seg_show_ms_block(0, 1000);
         } else {
+            // Cancelado por RST (mantiene comportamiento previo)
             uint16_t show = (total_ms <= 0) ? 0 :
                             (total_ms > MAX_TOTAL_MS ? MAX_TOTAL_MS : (uint16_t)total_ms);
-            if (show == MAX_TOTAL_MS) {
-                printf("LED%d -> Timeout: %u.%03u s\n", (int)target+1, show/1000, show%1000);
-            } else {
-                printf("LED%d -> Cancelado\n", (int)target+1);
-            }
+            printf("LED%d -> Cancelado\n", (int)target+1);
             display7seg_show_ms_block(show, 1000);
         }
 
