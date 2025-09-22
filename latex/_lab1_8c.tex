@@ -1,0 +1,152 @@
+\doxysection{Referencia del archivo Lab1.\+c}
+\hypertarget{_lab1_8c}{}\label{_lab1_8c}\index{Lab1.c@{Lab1.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}pico/stdlib.\+h"{}}\newline
+{\ttfamily \#include "{}pico/time.\+h"{}}\newline
+{\ttfamily \#include "{}lib/debounce/debounce.\+h"{}}\newline
+{\ttfamily \#include "{}lib/display7seg/display7seg.\+h"{}}\newline
+\doxysubsubsection*{defines}
+\begin{Indent}\textbf{ Pines de E/S}\par
+{\em Mapeo de pines de LEDs y botones (activo-\/bajo). }\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a8aa85ae9867fabf70ec72cd3bf6fb6b9}{LED1}}~11
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a3a4cc5e218cef7de139625a519e29ff3}{BTN1}}~20
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_ad09fe5bf321b9a2de26bd5e5b9af6424}{LED2}}~12
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a9dc19cdd6944e087c077044296a1ad8e}{BTN2}}~18
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a4b7ff8e253a7412f83deba3a447028a8}{LED3}}~13
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a32ab148d835d10ad11a9cdef186a3a13}{BTN3}}~19
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_ac5d957e4fd3dc11cd97a54cf9ca057a4}{RST}}~22
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Parámetros de juego}\par
+{\em Límites y tiempos (ms). }\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a62d66ad3c70b52de3efc74b6013633a5}{MAX\+\_\+\+ON\+\_\+\+MS}}~5000
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a10b36d39a21ce85a1381a6f3f7a0989d}{MAX\+\_\+\+TOTAL\+\_\+\+MS}}~9999
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a41bf2c413a75614e1a126ab9884915c7}{PENALTY\+\_\+\+INC\+\_\+\+MS}}~1000
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a220014872bc6bc5363855fd6329a67bc}{WAIT\+\_\+\+MIN\+\_\+\+MS}}~1000
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_ac83886b403a823332971f3f62b79f3ee}{WAIT\+\_\+\+MAX\+\_\+\+MS}}~5000
+\item 
+\#define \mbox{\hyperlink{_lab1_8c_a7714fb3e1d387bd490af0cf6823771b5}{ROUND\+\_\+\+PAUSE\+\_\+\+MS}}~1000
+\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsubsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{_lab1_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em Punto de entrada del programa. Implementa el bucle del juego. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{_lab1_8c_doc-define-members}
+\doxysubsection{Documentación de «define»}
+\Hypertarget{_lab1_8c_a3a4cc5e218cef7de139625a519e29ff3}\index{Lab1.c@{Lab1.c}!BTN1@{BTN1}}
+\index{BTN1@{BTN1}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{BTN1}{BTN1}}
+{\footnotesize\ttfamily \label{_lab1_8c_a3a4cc5e218cef7de139625a519e29ff3} 
+\#define BTN1~20}
+
+Botón asociado a LED1 (activo-\/bajo) \Hypertarget{_lab1_8c_a9dc19cdd6944e087c077044296a1ad8e}\index{Lab1.c@{Lab1.c}!BTN2@{BTN2}}
+\index{BTN2@{BTN2}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{BTN2}{BTN2}}
+{\footnotesize\ttfamily \label{_lab1_8c_a9dc19cdd6944e087c077044296a1ad8e} 
+\#define BTN2~18}
+
+Botón asociado a LED2 (activo-\/bajo) \Hypertarget{_lab1_8c_a32ab148d835d10ad11a9cdef186a3a13}\index{Lab1.c@{Lab1.c}!BTN3@{BTN3}}
+\index{BTN3@{BTN3}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{BTN3}{BTN3}}
+{\footnotesize\ttfamily \label{_lab1_8c_a32ab148d835d10ad11a9cdef186a3a13} 
+\#define BTN3~19}
+
+Botón asociado a LED3 (activo-\/bajo) \Hypertarget{_lab1_8c_a8aa85ae9867fabf70ec72cd3bf6fb6b9}\index{Lab1.c@{Lab1.c}!LED1@{LED1}}
+\index{LED1@{LED1}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{LED1}{LED1}}
+{\footnotesize\ttfamily \label{_lab1_8c_a8aa85ae9867fabf70ec72cd3bf6fb6b9} 
+\#define LED1~11}
+
+LED objetivo 1 \Hypertarget{_lab1_8c_ad09fe5bf321b9a2de26bd5e5b9af6424}\index{Lab1.c@{Lab1.c}!LED2@{LED2}}
+\index{LED2@{LED2}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{LED2}{LED2}}
+{\footnotesize\ttfamily \label{_lab1_8c_ad09fe5bf321b9a2de26bd5e5b9af6424} 
+\#define LED2~12}
+
+LED objetivo 2 \Hypertarget{_lab1_8c_a4b7ff8e253a7412f83deba3a447028a8}\index{Lab1.c@{Lab1.c}!LED3@{LED3}}
+\index{LED3@{LED3}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{LED3}{LED3}}
+{\footnotesize\ttfamily \label{_lab1_8c_a4b7ff8e253a7412f83deba3a447028a8} 
+\#define LED3~13}
+
+LED objetivo 3 \Hypertarget{_lab1_8c_a62d66ad3c70b52de3efc74b6013633a5}\index{Lab1.c@{Lab1.c}!MAX\_ON\_MS@{MAX\_ON\_MS}}
+\index{MAX\_ON\_MS@{MAX\_ON\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{MAX\_ON\_MS}{MAX\_ON\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_a62d66ad3c70b52de3efc74b6013633a5} 
+\#define MAX\+\_\+\+ON\+\_\+\+MS~5000}
+
+Duración máxima de una ronda (timeout) \Hypertarget{_lab1_8c_a10b36d39a21ce85a1381a6f3f7a0989d}\index{Lab1.c@{Lab1.c}!MAX\_TOTAL\_MS@{MAX\_TOTAL\_MS}}
+\index{MAX\_TOTAL\_MS@{MAX\_TOTAL\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{MAX\_TOTAL\_MS}{MAX\_TOTAL\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_a10b36d39a21ce85a1381a6f3f7a0989d} 
+\#define MAX\+\_\+\+TOTAL\+\_\+\+MS~9999}
+
+Tope mostrado en display (s.\+mmm -\/\texorpdfstring{$>$}{>} 9.\+999) \Hypertarget{_lab1_8c_a41bf2c413a75614e1a126ab9884915c7}\index{Lab1.c@{Lab1.c}!PENALTY\_INC\_MS@{PENALTY\_INC\_MS}}
+\index{PENALTY\_INC\_MS@{PENALTY\_INC\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{PENALTY\_INC\_MS}{PENALTY\_INC\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_a41bf2c413a75614e1a126ab9884915c7} 
+\#define PENALTY\+\_\+\+INC\+\_\+\+MS~1000}
+
+Penalización por botón incorrecto \Hypertarget{_lab1_8c_a7714fb3e1d387bd490af0cf6823771b5}\index{Lab1.c@{Lab1.c}!ROUND\_PAUSE\_MS@{ROUND\_PAUSE\_MS}}
+\index{ROUND\_PAUSE\_MS@{ROUND\_PAUSE\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{ROUND\_PAUSE\_MS}{ROUND\_PAUSE\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_a7714fb3e1d387bd490af0cf6823771b5} 
+\#define ROUND\+\_\+\+PAUSE\+\_\+\+MS~1000}
+
+Pausa entre rondas (cancelable) \Hypertarget{_lab1_8c_ac5d957e4fd3dc11cd97a54cf9ca057a4}\index{Lab1.c@{Lab1.c}!RST@{RST}}
+\index{RST@{RST}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{RST}{RST}}
+{\footnotesize\ttfamily \label{_lab1_8c_ac5d957e4fd3dc11cd97a54cf9ca057a4} 
+\#define RST~22}
+
+Botón de inicio/cancelación (activo-\/bajo) \Hypertarget{_lab1_8c_ac83886b403a823332971f3f62b79f3ee}\index{Lab1.c@{Lab1.c}!WAIT\_MAX\_MS@{WAIT\_MAX\_MS}}
+\index{WAIT\_MAX\_MS@{WAIT\_MAX\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{WAIT\_MAX\_MS}{WAIT\_MAX\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_ac83886b403a823332971f3f62b79f3ee} 
+\#define WAIT\+\_\+\+MAX\+\_\+\+MS~5000}
+
+Espera aleatoria máxima antes de encender LED \Hypertarget{_lab1_8c_a220014872bc6bc5363855fd6329a67bc}\index{Lab1.c@{Lab1.c}!WAIT\_MIN\_MS@{WAIT\_MIN\_MS}}
+\index{WAIT\_MIN\_MS@{WAIT\_MIN\_MS}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{WAIT\_MIN\_MS}{WAIT\_MIN\_MS}}
+{\footnotesize\ttfamily \label{_lab1_8c_a220014872bc6bc5363855fd6329a67bc} 
+\#define WAIT\+\_\+\+MIN\+\_\+\+MS~1000}
+
+Espera aleatoria mínima antes de encender LED 
+
+\label{doc-func-members}
+\Hypertarget{_lab1_8c_doc-func-members}
+\doxysubsection{Documentación de funciones}
+\Hypertarget{_lab1_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{Lab1.c@{Lab1.c}!main@{main}}
+\index{main@{main}!Lab1.c@{Lab1.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{_lab1_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Punto de entrada del programa. Implementa el bucle del juego. 
+
+Flujo principal\+: 1) Espera de inicio (RST). 2) Secuencia de arranque. 3) Espera aleatoria (cancelable) y encendido de un LED objetivo. 4) Medición del tiempo de reacción con penalizaciones por botón incorrecto. 5) Presentación del resultado en el display (s.\+mmm), timeout o cancelación. 6) Pausa entre rondas.
+
+\begin{DoxyReturn}{Devuelve}
+int Código de retorno (no retorna en operación normal). 
+\end{DoxyReturn}

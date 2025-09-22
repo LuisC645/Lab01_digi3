@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Lab01: Juego de tiempo de reacción — RP2040 + 7 segmentos</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">Lab01<span id="projectnumber">&#160;1.0</span>
+   </div>
+   <div id="projectbrief">Juego de reacción con leds + displays 7 segmentos</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generado por Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Buscar',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Cargando...</div>
+<div class="SRStatus" id="Searching">Buscando...</div>
+<div class="SRStatus" id="NoMatches">Nada coincide</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div><div class="header">
+  <div class="headertitle"><div class="title">Juego de tiempo de reacción — RP2040 + 7 segmentos </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p><a class="anchor" id="autotoc_md0"></a></p>
+<p>Proyecto para Raspberry Pi Pico (RP2040) que mide el tiempo de reacción con 3 LEDs y botones, mostrando el resultado en un display 7 segmentos de 4 dígitos (ánodo común) multiplexado con transistores PNP.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
+Estructura del repositorio</h1>
+<div class="fragment"><div class="line">├─ lib/</div>
+<div class="line">│  ├─ debounce/</div>
+<div class="line">│  │  ├─ debounce.h</div>
+<div class="line">│  │  └─ debounce.c</div>
+<div class="line">│  └─ display7seg/</div>
+<div class="line">│     ├─ display7seg.h</div>
+<div class="line">│     └─ display7seg.c</div>
+<div class="line">├─ src/</div>
+<div class="line">│  └─ main.c</div>
+<div class="line">├─ CMakeLists.txt</div>
+<div class="line">└─ README.md</div>
+</div><!-- fragment --> <hr  />
+<h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+🔌 Mapeo de pines</h1>
+<p><b>Display (segmentos a..g + dp):</b></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadRight">Segmento  </th><th class="markdownTableHeadCenter">GPIO  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyRight">a b c d e f g  </td><td class="markdownTableBodyCenter">0,1,2,3,4,5,6  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyRight">dp  </td><td class="markdownTableBodyCenter">7  </td></tr>
+</table>
+<p><b>Dígitos (PNP alto-lado, D0 izquierda → D3 derecha):</b></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadRight">Dígito  </th><th class="markdownTableHeadCenter">GPIO  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyRight">D0 D1 D2 D3  </td><td class="markdownTableBodyCenter">28, 27, 26, 21  </td></tr>
+</table>
+<p><b>Juego (LEDs/Botones):</b></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadRight">Elemento  </th><th class="markdownTableHeadCenter">GPIO  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyRight">LED1 / BTN1  </td><td class="markdownTableBodyCenter">11 / 20  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyRight">LED2 / BTN2  </td><td class="markdownTableBodyCenter">12 / 18  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyRight">LED3 / BTN3  </td><td class="markdownTableBodyCenter">13 / 19  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyRight">RST (activo-bajo)  </td><td class="markdownTableBodyCenter">22  </td></tr>
+</table>
+<blockquote class="doxtable">
+<p>Los botones son <b>activo-bajo</b> con <b>pull-up</b> (habilitados en la lib <span class="tt">debounce</span>). </p>
+</blockquote>
+<hr  />
+ </div></div><!-- contents -->
+</div><!-- PageDoc -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generado por&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

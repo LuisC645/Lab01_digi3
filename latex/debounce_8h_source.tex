@@ -1,0 +1,30 @@
+\doxysection{debounce.\+h}
+\hypertarget{debounce_8h_source}{}\label{debounce_8h_source}\index{lib/debounce/debounce.h@{lib/debounce/debounce.h}}
+\mbox{\hyperlink{debounce_8h}{Ir a la documentación de este archivo.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ <pico/stdlib.h>}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ btn\_init(uint\ pin)\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ gpio\_init(pin);}
+\DoxyCodeLine{00029\ \ \ \ \ gpio\_set\_dir(pin,\ GPIO\_IN);}
+\DoxyCodeLine{00030\ \ \ \ \ gpio\_pull\_up(pin);}
+\DoxyCodeLine{00031\ \}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ btn\_pressed(uint\ pin)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (!gpio\_get(pin))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ activo-\/bajo\ -\/>\ presionado\ (nivel\ 0)}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ sleep\_ms(20);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ retardo\ de\ antirrebote\ (debounce)}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!gpio\_get(pin))\ \{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ confirma\ que\ sigue\ presionado}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!gpio\_get(pin))\ \{\ \textcolor{comment}{//\ espera\ activa\ hasta\ que\ se\ suelte}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tight\_loop\_contents();}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pulsación\ única\ confirmada}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ no\ hay\ pulsación\ válida}}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}

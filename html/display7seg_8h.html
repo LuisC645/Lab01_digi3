@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Lab01: Referencia del archivo lib/display7seg/display7seg.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">Lab01<span id="projectnumber">&#160;1.0</span>
+   </div>
+   <div id="projectbrief">Juego de reacción con leds + displays 7 segmentos</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generado por Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Buscar',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Cargando...</div>
+<div class="SRStatus" id="Searching">Buscando...</div>
+<div class="SRStatus" id="NoMatches">Nada coincide</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_97aefd0d527b934f1d99a682da8fe6a9.html">lib</a></li><li class="navelem"><a href="dir_ae5f12c32e8bcb79b0fdad9a6cc1ffc9.html">display7seg</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Funciones</a>  </div>
+  <div class="headertitle"><div class="title">Referencia del archivo display7seg.h</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>API para display 7 segmentos (4 dígitos, ánodo común) con multiplexado.  
+<a href="#details">Más...</a></p>
+<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;pico/stdlib.h&gt;</code><br />
+</div>
+<p><a href="display7seg_8h_source.html">Ir al código fuente de este archivo.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Funciones</h2></td></tr>
+<tr class="memitem:a58c86e3d5264ed368ee94953f885181a" id="r_a58c86e3d5264ed368ee94953f885181a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a58c86e3d5264ed368ee94953f885181a">display7seg_init</a> (void)</td></tr>
+<tr class="memdesc:a58c86e3d5264ed368ee94953f885181a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inicializa pines y estado interno del display.  <br /></td></tr>
+<tr class="memitem:ad29c30de523890a59ea9b4f2b6835d48" id="r_ad29c30de523890a59ea9b4f2b6835d48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad29c30de523890a59ea9b4f2b6835d48">display7seg_set_raw</a> (uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)</td></tr>
+<tr class="memdesc:ad29c30de523890a59ea9b4f2b6835d48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Carga cuatro dígitos crudos en el buffer.  <br /></td></tr>
+<tr class="memitem:a29d8cb888ece98bb23a2d33aaeecf129" id="r_a29d8cb888ece98bb23a2d33aaeecf129"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29d8cb888ece98bb23a2d33aaeecf129">display7seg_set_s_mmm</a> (uint16_t ms)</td></tr>
+<tr class="memdesc:a29d8cb888ece98bb23a2d33aaeecf129"><td class="mdescLeft">&#160;</td><td class="mdescRight">Carga en el buffer un tiempo en formato s.mmm.  <br /></td></tr>
+<tr class="memitem:ae231deab0cefa239b672af6fbb72ca4a" id="r_ae231deab0cefa239b672af6fbb72ca4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae231deab0cefa239b672af6fbb72ca4a">display7seg_refresh_once</a> (void)</td></tr>
+<tr class="memdesc:ae231deab0cefa239b672af6fbb72ca4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refresca un dígito (multiplexado). Llamar muy seguido.  <br /></td></tr>
+<tr class="memitem:a91a8eda324568027ef6b3bafdde07bed" id="r_a91a8eda324568027ef6b3bafdde07bed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91a8eda324568027ef6b3bafdde07bed">display7seg_show_ms_block</a> (uint16_t ms, uint16_t hold_ms)</td></tr>
+<tr class="memdesc:a91a8eda324568027ef6b3bafdde07bed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Muestra s.mmm de forma bloqueante durante hold_ms.  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Descripción detallada</h2>
+<div class="textblock"><p>API para display 7 segmentos (4 dígitos, ánodo común) con multiplexado. </p>
+<p>Inicializa el hardware, carga valores en el buffer y refresca el display. El punto decimal (DP) se muestra solo en el dígito 0 para el formato s.mmm.</p>
+<dl class="section note"><dt>Nota</dt><dd>Llama frecuentemente a <a class="el" href="#ae231deab0cefa239b672af6fbb72ca4a" title="Refresca un dígito (multiplexado). Llamar muy seguido.">display7seg_refresh_once()</a> o usa <a class="el" href="#a91a8eda324568027ef6b3bafdde07bed" title="Muestra s.mmm de forma bloqueante durante hold_ms.">display7seg_show_ms_block()</a> para mantener visible el display.</dd></dl>
+<dl class="section author"><dt>Autor</dt><dd>Luis Castillo Chicaiza </dd></dl>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Documentación de funciones</h2>
+<a id="a58c86e3d5264ed368ee94953f885181a" name="a58c86e3d5264ed368ee94953f885181a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58c86e3d5264ed368ee94953f885181a">&#9670;&#160;</a></span>display7seg_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display7seg_init </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Inicializa pines y estado interno del display. </p>
+
+</div>
+</div>
+<a id="ae231deab0cefa239b672af6fbb72ca4a" name="ae231deab0cefa239b672af6fbb72ca4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae231deab0cefa239b672af6fbb72ca4a">&#9670;&#160;</a></span>display7seg_refresh_once()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display7seg_refresh_once </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Refresca un dígito (multiplexado). Llamar muy seguido. </p>
+
+</div>
+</div>
+<a id="ad29c30de523890a59ea9b4f2b6835d48" name="ad29c30de523890a59ea9b4f2b6835d48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad29c30de523890a59ea9b4f2b6835d48">&#9670;&#160;</a></span>display7seg_set_raw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display7seg_set_raw </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>d0</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>d1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>d2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>d3</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Carga cuatro dígitos crudos en el buffer. </p>
+<dl class="params"><dt>Parámetros</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d0</td><td>D0 (izquierda) — válidos: 0..9, 10=BLANK </td></tr>
+    <tr><td class="paramname">d1</td><td>D1 — válidos: 0..9, 10=BLANK </td></tr>
+    <tr><td class="paramname">d2</td><td>D2 — válidos: 0..9, 10=BLANK </td></tr>
+    <tr><td class="paramname">d3</td><td>D3 (derecha) — válidos: 0..9, 10=BLANK </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Nota</dt><dd>Requiere refrescar con <a class="el" href="#ae231deab0cefa239b672af6fbb72ca4a" title="Refresca un dígito (multiplexado). Llamar muy seguido.">display7seg_refresh_once()</a>. </dd></dl>
+
+</div>
+</div>
+<a id="a29d8cb888ece98bb23a2d33aaeecf129" name="a29d8cb888ece98bb23a2d33aaeecf129"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29d8cb888ece98bb23a2d33aaeecf129">&#9670;&#160;</a></span>display7seg_set_s_mmm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display7seg_set_s_mmm </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>ms</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Carga en el buffer un tiempo en formato s.mmm. </p>
+<dl class="params"><dt>Parámetros</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ms</td><td>Milisegundos (0..9999). Se satura a 9999. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Nota</dt><dd>DP solo en el dígito 0. Requiere refresco periódico. </dd></dl>
+
+</div>
+</div>
+<a id="a91a8eda324568027ef6b3bafdde07bed" name="a91a8eda324568027ef6b3bafdde07bed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91a8eda324568027ef6b3bafdde07bed">&#9670;&#160;</a></span>display7seg_show_ms_block()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display7seg_show_ms_block </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>ms</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>hold_ms</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Muestra s.mmm de forma bloqueante durante hold_ms. </p>
+<dl class="params"><dt>Parámetros</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ms</td><td>Valor (0..9999) </td></tr>
+    <tr><td class="paramname">hold_ms</td><td>Duración de visualización en ms </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generado por&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

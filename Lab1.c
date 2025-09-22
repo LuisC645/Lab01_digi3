@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @brief Juego de tiempo de reacción para RP2040 con display 7 segmentos.
+ *
+ * Mide el tiempo de reacción del usuario con 3 LEDs y 3 botones.
+ * Muestra el resultado en un display 7 segmentos (4 dígitos, ánodo común) en formato s.mmm.
+ * Multiplexado por software con refresco periódico en los bucles de espera.
+ * 
+ * @author Luis Castillo Chicaiza
+ */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -7,41 +18,64 @@
 #include "lib/debounce/debounce.h"
 #include "lib/display7seg/display7seg.h"
 
-// Pines
-#define LED1 11
-#define BTN1 20
+/** @name Pines de E/S
+ *  @brief Mapeo de pines de LEDs y botones (activo-bajo).
+ *  @{
+ */
+#define LED1 11  /**< LED objetivo 1 */
+#define BTN1 20  /**< Botón asociado a LED1 (activo-bajo) */
 
-#define LED2 12
-#define BTN2 18
+#define LED2 12  /**< LED objetivo 2 */
+#define BTN2 18  /**< Botón asociado a LED2 (activo-bajo) */
 
-#define LED3 13
-#define BTN3 19
+#define LED3 13  /**< LED objetivo 3 */
+#define BTN3 19  /**< Botón asociado a LED3 (activo-bajo) */
 
-#define RST  22
+#define RST  22  /**< Botón de inicio/cancelación (activo-bajo) */
+/** @} */
 
-// Globales
-#define MAX_ON_MS        5000   // 5s max
-#define MAX_TOTAL_MS     9999   // max en disp
-#define PENALTY_INC_MS   1000   // penalización
-#define WAIT_MIN_MS      1000
-#define WAIT_MAX_MS      5000
-#define ROUND_PAUSE_MS   1000
+/** @name Parámetros de juego
+ *  @brief Límites y tiempos (ms).
+ *  @{
+ */
+#define MAX_ON_MS        5000   /**< Duración máxima de una ronda (timeout) */
+#define MAX_TOTAL_MS     9999   /**< Tope mostrado en display (s.mmm -> 9.999) */
+#define PENALTY_INC_MS   1000   /**< Penalización por botón incorrecto */
+#define WAIT_MIN_MS      1000   /**< Espera aleatoria mínima antes de encender LED */
+#define WAIT_MAX_MS      5000   /**< Espera aleatoria máxima antes de encender LED */
+#define ROUND_PAUSE_MS   1000   /**< Pausa entre rondas (cancelable) */
+/** @} */
 
-// Utilidad time (contador el tiempo)
+/**
+ * @brief Milisegundos transcurridos desde un instante dado.
+ * @param t0 Instante de referencia (obtenido con get_absolute_time()).
+ * @return Milisegundos transcurridos (puede ser negativo si t0 es futuro).
+ */
 static inline int64_t ms_since(absolute_time_t t0) {
     return absolute_time_diff_us(t0, get_absolute_time()) / 1000;
 }
 
-// Random
+/**
+ * @brief Pseudo-aleatorio uniforme en [min_incl, max_incl].
+ * @param min_incl Límite inferior (incluido).
+ * @param max_incl Límite superior (incluido).
+ * @return Valor entero en el rango especificado.
+ *
+ * @note Usa time_us_32() como fuente de entropía simple (suficiente aquí).
+ */
 static uint32_t rng(uint32_t min_incl, uint32_t max_incl) {
-    uint32_t now  = time_us_32();                  // cambia todo el tiempo
-    uint32_t span = (max_incl - min_incl + 1u);    // tamaño del rango
+    uint32_t now  = time_us_32();
+    uint32_t span = (max_incl - min_incl + 1u);
     return min_incl + (now % span);
 }
 
-// Esperar hasta
+/**
+ * @brief Espera bloqueante manteniendo el refresco del display, cancelable por RST.
+ * @param ms Tiempo a esperar en milisegundos.
+ * @return true si se presionó RST (cancelación), false si terminó el tiempo.
+ */
 static bool wait_until_or_rst(uint32_t ms) {
-    absolute_time_t t_end = make_timeout_time_ms(ms); //t_end + now + ms
+    absolute_time_t t_end = make_timeout_time_ms(ms);
     while (absolute_time_diff_us(t_end, get_absolute_time()) > 0) {
         if (btn_pressed(RST)) return true;
         display7seg_refresh_once();
@@ -49,7 +83,12 @@ static bool wait_until_or_rst(uint32_t ms) {
     return false;
 }
 
-// Espera aleatoria
+/**
+ * @brief Espera aleatoria en [min_ms, max_ms], con refresco del display y cancelable por RST.
+ * @param min_ms Límite inferior (ms).
+ * @param max_ms Límite superior (ms).
+ * @return true si se presionó RST (cancelación), false si se cumplió el tiempo aleatorio.
+ */
 static bool wait_rand_or_rst(uint32_t min_ms, uint32_t max_ms) {
     uint32_t wait_ms = min_ms + (time_us_32() % (max_ms - min_ms + 1u));
     uint32_t t0 = to_ms_since_boot(get_absolute_time());
@@ -61,19 +100,31 @@ static bool wait_rand_or_rst(uint32_t min_ms, uint32_t max_ms) {
     }
 }
 
-// Leds
+/**
+ * @brief Inicializa un LED como salida y lo apaga.
+ * @param pin GPIO del LED.
+ */
 static void led_init(uint pin) {
     gpio_init(pin);
     gpio_set_dir(pin, GPIO_OUT);
     gpio_put(pin, 0);
 }
+
+/**
+ * @brief Apaga los tres LEDs objetivo.
+ */
 static void leds_off_all(void) {
     gpio_put(LED1, 0);
     gpio_put(LED2, 0);
     gpio_put(LED3, 0);
 }
 
-// Espera al inicio
+/**
+ * @brief Espera el inicio del usuario: parpadeo de LEDs y arranque al presionar RST.
+ *
+ * Parpadea los LEDs cada ~300 ms hasta que se presiona RST.
+ * Durante la espera se refresca el display para mantener la multiplexación.
+ */
 static void wait_for_start(void) {
     absolute_time_t t0 = get_absolute_time();
     bool phase = false;
@@ -88,7 +139,10 @@ static void wait_for_start(void) {
     }
 }
 
-// Espera con refresco del display
+/**
+ * @brief Espera bloqueante con refresco de display (helper).
+ * @param ms Milisegundos a mantener el refresco.
+ */
 static void hold_with_refresh(uint32_t ms) {
     absolute_time_t t_end = make_timeout_time_ms(ms);
     while (absolute_time_diff_us(t_end, get_absolute_time()) > 0) {
@@ -96,6 +150,12 @@ static void hold_with_refresh(uint32_t ms) {
     }
 }
 
+/**
+ * @brief Secuencia visual de arranque (LEDs 000 → 111 → 011 → 001 → 000).
+ *
+ * Durante la secuencia se hace pausas de 1 s con el display sin necesidad de actualización activa adicional,
+ * y se fija el display en 0.000 al inicio y fin para coherencia visual.
+ */
 static void start_sequence(void) {
 
     display7seg_set_s_mmm(0);
@@ -121,6 +181,19 @@ static void start_sequence(void) {
 
 }
 
+/**
+ * @brief Punto de entrada del programa. Implementa el bucle del juego.
+ *
+ * Flujo principal:
+ * 1) Espera de inicio (RST).
+ * 2) Secuencia de arranque.
+ * 3) Espera aleatoria (cancelable) y encendido de un LED objetivo.
+ * 4) Medición del tiempo de reacción con penalizaciones por botón incorrecto.
+ * 5) Presentación del resultado en el display (s.mmm), timeout o cancelación.
+ * 6) Pausa entre rondas.
+ *
+ * @return int Código de retorno (no retorna en operación normal).
+ */
 int main(void) {
     stdio_init_all();
 
@@ -185,7 +258,6 @@ int main(void) {
             if (elapsed >= MAX_ON_MS) {
                 total_ms = MAX_ON_MS;
                 finished = false;
-                // printf("\rLED%d encendido. Tiempo: %lld ms\n", (int)target+1, (long long)MAX_ON_MS);
                 display7seg_set_s_mmm(MAX_ON_MS > 9999 ? 9999 : (uint16_t)MAX_ON_MS);
                 break;
             }
@@ -193,7 +265,6 @@ int main(void) {
             // Tiempo en vivo (cada 100 ms)
             if (elapsed - last_report_ms >= report_step_ms) {
                 last_report_ms = elapsed;
-                // printf("\rLED%d encendido. Tiempo: %lld ms", (int)target+1, (long long)elapsed);
                 display7seg_set_s_mmm((uint16_t)(elapsed > 9999 ? 9999 : (elapsed < 0 ? 0 : elapsed)));
                 fflush(stdout);
             }

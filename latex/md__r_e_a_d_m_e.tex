@@ -1,0 +1,82 @@
+\chapter{Juego de tiempo de reacción — RP2040 + 7 segmentos }
+\hypertarget{md__r_e_a_d_m_e}{}\label{md__r_e_a_d_m_e}\index{Juego de tiempo de reacción — RP2040 + 7 segmentos@{Juego de tiempo de reacción — RP2040 + 7 segmentos}}
+\label{md__r_e_a_d_m_e_autotoc_md0}%
+\Hypertarget{md__r_e_a_d_m_e_autotoc_md0}%
+
+
+Proyecto para Raspberry Pi Pico (RP2040) que mide el tiempo de reacción con 3 LEDs y botones, mostrando el resultado en un display 7 segmentos de 4 dígitos (ánodo común) multiplexado con transistores PNP.\hypertarget{md__r_e_a_d_m_e_autotoc_md1}{}\doxysection{\texorpdfstring{Estructura del repositorio}{Estructura del repositorio}}\label{md__r_e_a_d_m_e_autotoc_md1}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{├─\ lib/}
+\DoxyCodeLine{│\ \ ├─\ debounce/}
+\DoxyCodeLine{│\ \ │\ \ ├─\ debounce.h}
+\DoxyCodeLine{│\ \ │\ \ └─\ debounce.c}
+\DoxyCodeLine{│\ \ └─\ display7seg/}
+\DoxyCodeLine{│\ \ \ \ \ ├─\ display7seg.h}
+\DoxyCodeLine{│\ \ \ \ \ └─\ display7seg.c}
+\DoxyCodeLine{├─\ src/}
+\DoxyCodeLine{│\ \ └─\ main.c}
+\DoxyCodeLine{├─\ CMakeLists.txt}
+\DoxyCodeLine{└─\ README.md}
+
+\end{DoxyCode}
+ \DoxyHorRuler{0}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md3}{}\doxysection{\texorpdfstring{🔌 Mapeo de pines}{🔌 Mapeo de pines}}\label{md__r_e_a_d_m_e_autotoc_md3}
+{\bfseries{Display (segmentos a..g + dp)\+:}}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Segmento  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Segmento  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endhead
+\PBS\raggedleft a b c d e f g  &\PBS\centering 0,1,2,3,4,5,6  \\\cline{1-2}
+\PBS\raggedleft dp  &\PBS\centering 7  \\\cline{1-2}
+\end{longtabu}
+
+
+{\bfseries{Dígitos (PNP alto-\/lado, D0 izquierda → D3 derecha)\+:}}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Dígito  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Dígito  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endhead
+\PBS\raggedleft D0 D1 D2 D3  &\PBS\centering 28, 27, 26, 21  \\\cline{1-2}
+\end{longtabu}
+
+
+{\bfseries{Juego (LEDs/\+Botones)\+:}}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Elemento  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\raggedleft \cellcolor{\tableheadbgcolor}\textbf{ Elemento  }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ GPIO  }\\\cline{1-2}
+\endhead
+\PBS\raggedleft LED1 / BTN1  &\PBS\centering 11 / 20  \\\cline{1-2}
+\PBS\raggedleft LED2 / BTN2  &\PBS\centering 12 / 18  \\\cline{1-2}
+\PBS\raggedleft LED3 / BTN3  &\PBS\centering 13 / 19  \\\cline{1-2}
+\PBS\raggedleft RST (activo-\/bajo)  &\PBS\centering 22  \\\cline{1-2}
+\end{longtabu}
+
+
+\begin{quote}
+Los botones son {\bfseries{activo-\/bajo}} con {\bfseries{pull-\/up}} (habilitados en la lib {\ttfamily debounce}). \end{quote}
+
+
+\DoxyHorRuler{0}
+ 

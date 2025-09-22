@@ -1,0 +1,28 @@
+\doxysection{Referencia del archivo lib/debounce/debounce.h}
+\hypertarget{debounce_8h}{}\label{debounce_8h}\index{lib/debounce/debounce.h@{lib/debounce/debounce.h}}
+
+
+Utilidades mínimas de botón con antirrebote para RP2040 (activo-\/bajo).  
+
+
+{\ttfamily \#include $<$pico/stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+
+
+\doxysubsection{Descripción detallada}
+Utilidades mínimas de botón con antirrebote para RP2040 (activo-\/bajo). 
+
+Implementación {\itshape header-\/only}\+:
+\begin{DoxyItemize}
+\item {\ttfamily btn\+\_\+init(pin)}\+: configura GPIO como entrada con pull-\/up interno.
+\item {\ttfamily btn\+\_\+pressed(pin)}\+: detecta pulsación con retardo de antirrebote y {\bfseries{bloquea}} hasta que el usuario suelte el botón (edge + hold-\/off).
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Nota}
+Convención {\bfseries{activo-\/bajo}}\+: presionado = nivel 0. 
+
+{\ttfamily btn\+\_\+pressed()} es {\bfseries{bloqueante}} mientras el botón permanezca presionado. 
+\end{DoxyNote}
+\begin{DoxyAuthor}{Autor}
+Luis Castillo Chicaiza 
+\end{DoxyAuthor}
