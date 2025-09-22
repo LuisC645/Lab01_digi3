@@ -1,36 +1,48 @@
-# Juego de Tiempos de Reacción – Bitácora de Desarrollo
+# Juego de tiempo de reacción — RP2040 + 7 segmentos
 
-## Avances
-- Configuración del proyecto con **SDK de Raspberry Pi Pico** en C.
-- Pruebas iniciales con **un LED y un botón** (GPIO16 y GPIO14).
-- Extensión a **2 LEDs + 2 botones** y luego a **3 LEDs + 3 botones**.
-- Implementación del **flujo básico del juego**:
-  1. Animación de inicio con LEDs.
-  2. Espera aleatoria (1–5 s).
-  3. LED aleatorio se enciende.
-  4. Usuario presiona el botón asociado:
-     - Correcto → mide tiempo de reacción.
-     - Incorrecto → penalización de **+1000 ms**.
-  5. Si pasan **10 s totales** (incluyendo penalizaciones) → se corta la ronda automáticamente.
-- Ajuste de salida por USB serial:
-  - `stdout` configurado **sin buffer** para evitar lag al imprimir.
-  - Impresión inmediata de resultados.
+Proyecto para Raspberry Pi Pico (RP2040) que mide el tiempo de reacción con 3 LEDs y botones, mostrando el resultado en un display 7 segmentos de 4 dígitos (ánodo común) multiplexado con transistores PNP.
 
-## Observaciones
-- Penalizaciones múltiples se acumulan hasta que el tiempo total llega a **9999 ms** (tope).
-- Se detectó “lag” en los `printf` -> **no corregido**.
-- Actualmente los botones **no tienen antirrebote**, lo que puede generar penalizaciones extra por ruido mecánico.
+## Estructura del repositorio
+```
+├─ lib/
+│  ├─ debounce/
+│  │  ├─ debounce.h
+│  │  └─ debounce.c
+│  └─ display7seg/
+│     ├─ display7seg.h
+│     └─ display7seg.c
+├─ src/
+│  └─ main.c
+├─ CMakeLists.txt
+└─ README.md
+```
+---
 
-## Pendientes
-- [ ] **Antirrebote (debounce)** en botones (20–30 ms) para evitar lecturas dobles.
-- [ ] **Display de 7 segmentos (3 dígitos + signo):**
-  - Mostrar tiempos en ms (0–9999).
-  - Multiplexado de los dígitos.
-  - Indicación de penalización.
-- [ ] **Botón de reinicio de juego** dedicado.
-  - Escenarios de prueba.
-  - Requisitos de entrega (diagrama de conexiones, explicación de código, etc.).
+## 🔌 Mapeo de pines
 
-## Notas rápidas
-- LEDs conectados con resistencias de 1k
-- Botones con **pull-up interno** (presionado = nivel bajo).
+**Display (segmentos a..g + dp):**
+
+| Segmento | GPIO |
+|---------:|:----:|
+| a b c d e f g | 0,1,2,3,4,5,6 |
+| dp | 7 |
+
+**Dígitos (PNP alto-lado, D0 izquierda → D3 derecha):**
+
+| Dígito | GPIO |
+|------:|:----:|
+| D0 D1 D2 D3 | 28, 27, 26, 21 |
+
+**Juego (LEDs/Botones):**
+
+| Elemento | GPIO |
+|--------:|:----:|
+| LED1 / BTN1 | 11 / 20 |
+| LED2 / BTN2 | 12 / 18 |
+| LED3 / BTN3 | 13 / 19 |
+| RST (activo-bajo) | 22 |
+
+> Los botones son **activo-bajo** con **pull-up** (habilitados en la lib `debounce`).
+
+---
+

@@ -10,7 +10,7 @@ static inline void btn_init(uint pin) {
     gpio_pull_up(pin);
 }
 
-// Devuelve true si el botón fue presionado (con antirrebote sencillo)
+// Devuelve true si el botón fue presionado
 static inline bool btn_pressed(uint pin) {
     if (!gpio_get(pin)) {            // activo-bajo -> presionado
         sleep_ms(20);                // retardo de antirrebote
