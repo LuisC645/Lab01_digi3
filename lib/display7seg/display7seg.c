@@ -1,109 +1,91 @@
 #include "display7seg.h"
 #include <pico/time.h>
+#include <hardware/gpio.h>
 
-/* ========= AJUSTA ESTOS PINES A TU CONEXIÓN =========
-   Segmentos en orden: a,b,c,d,e,f,g,dp
-   Dígitos en orden:   D0 (izq) .. D3 (der) */
-static const uint SEG_PINS[8] = {0, 1, 2, 3, 4, 5, 6};
-static const uint DIG_PINS[4] = {28, 27, 26, 22};
-/* ==================================================== */
+// Pines fijos: a..g y D0..D3
+static const uint SEG_PINS[7] = {0, 1, 2, 3, 4, 5, 6};
+static const uint DIG_PINS[4] = {28, 27, 26, 21};
+static const uint DP_PIN = 7; 
 
-/* Ánodo común: segmentos activos en BAJO, dígitos activos en ALTO */
+// Polaridades: ánodo común + PNP
 #define SEG_ON   0
 #define SEG_OFF  1
-#define DIG_ON   1
-#define DIG_OFF  0
+#define DIG_ON   0
+#define DIG_OFF  1
 
-/* Mapa de segmentos (a..g) invertido para ánodo común; dp se maneja aparte.
-   Índices: 0..9, y 10 = BLANK */
-static const uint8_t SEG_MAP_AC[11] = {
-    (uint8_t)(~0x3F) & 0x7F, // 0
-    (uint8_t)(~0x06) & 0x7F, // 1
-    (uint8_t)(~0x5B) & 0x7F, // 2
-    (uint8_t)(~0x4F) & 0x7F, // 3
-    (uint8_t)(~0x66) & 0x7F, // 4
-    (uint8_t)(~0x6D) & 0x7F, // 5
-    (uint8_t)(~0x7D) & 0x7F, // 6
-    (uint8_t)(~0x07) & 0x7F, // 7
-    (uint8_t)(~0x7F) & 0x7F, // 8
-    (uint8_t)(~0x67) & 0x7F, // 9
-    0x00                     // 10 = BLANK
+// Tabla lógica (bit0=a .. bit6=g): 1 = segmento encendido
+static const uint8_t SEG_MAP[11] = {
+    0x3F, /*0*/ 0x06, /*1*/ 0x5B, /*2*/ 0x4F, /*3*/
+    0x66, /*4*/ 0x6D, /*5*/ 0x7D, /*6*/ 0x07, /*7*/
+    0x7F, /*8*/ 0x67, /*9*/ 0x00  /*BLANK*/
 };
 
-/* Buffer y estado interno */
-static uint8_t digits[4] = {10,10,10,10};  // 10 = blank
-static uint8_t dp_mask   = 0x00;           // bit i -> DP del dígito i
-static uint8_t cur_digit = 0;              // 0..3
-static const uint16_t HOLD_US = 1000;      // ~1 ms por dígito (~250 Hz total)
+static uint8_t digits[4] = {10,10,10,10}; // 10 = blank
+static uint8_t cur_digit = 0;             // 0..3
 
-static inline void seg_write_raw(uint8_t pattern, bool dp_on) {
-    /* a..g */
-    for (int i = 0; i < 7; ++i) {
-        bool on = (pattern >> i) & 0x01;
+#define DISPLAY7SEG_HOLD_US 800
+
+static inline void dig_all_off(void){
+    for (int i=0;i<4;i++) gpio_put(DIG_PINS[i], DIG_OFF);
+}
+static inline void dig_on(uint8_t idx){
+    for (int i=0;i<4;i++) gpio_put(DIG_PINS[i], (i==idx)?DIG_ON:DIG_OFF);
+}
+static inline void seg_write(uint8_t pattern){
+    for (int i=0;i<7;i++){
+        bool on = (pattern >> i) & 1;
         gpio_put(SEG_PINS[i], on ? SEG_ON : SEG_OFF);
     }
-    /* dp */
-    gpio_put(SEG_PINS[7], dp_on ? SEG_ON : SEG_OFF);
 }
 
-static inline void dig_all_off(void) {
-    for (int i = 0; i < 4; ++i) gpio_put(DIG_PINS[i], DIG_OFF);
+void display7seg_init(void){
+    for (int i=0;i<7;i++){ gpio_init(SEG_PINS[i]); gpio_set_dir(SEG_PINS[i], GPIO_OUT); gpio_put(SEG_PINS[i], SEG_OFF); }
+    
+    // DP como out (siempre encendido)
+    gpio_init(DP_PIN);
+    gpio_set_dir(DP_PIN, GPIO_OUT);
+    gpio_put(DP_PIN, SEG_OFF);
+
+    for (int i=0;i<4;i++){ gpio_init(DIG_PINS[i]); gpio_set_dir(DIG_PINS[i], GPIO_OUT); gpio_put(DIG_PINS[i], DIG_OFF); }
+    for (int i=0;i<4;i++) digits[i]=10;
+    cur_digit=0;
 }
 
-static inline void dig_on(uint8_t idx) {
-    for (int i = 0; i < 4; ++i) gpio_put(DIG_PINS[i], (i == idx) ? DIG_ON : DIG_OFF);
+void display7seg_set_raw(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3){
+    digits[0] = (d0<=10)?d0:10;
+    digits[1] = (d1<=10)?d1:10;
+    digits[2] = (d2<=10)?d2:10;
+    digits[3] = (d3<=10)?d3:10;
 }
 
-/* API mínima */
-void display7seg_init(void) {
-    for (int i = 0; i < 8; ++i) {
-        gpio_init(SEG_PINS[i]);
-        gpio_set_dir(SEG_PINS[i], GPIO_OUT);
-        gpio_put(SEG_PINS[i], SEG_OFF);
-    }
-    for (int i = 0; i < 4; ++i) {
-        gpio_init(DIG_PINS[i]);
-        gpio_set_dir(DIG_PINS[i], GPIO_OUT);
-        gpio_put(DIG_PINS[i], DIG_OFF);
-    }
-    for (int i = 0; i < 4; ++i) digits[i] = 10;
-    dp_mask = 0x00;
-    cur_digit = 0;
+void display7seg_set_s_mmm(uint16_t ms){
+    if (ms>9999) ms=9999;
+    uint8_t s  = (uint8_t)(ms/1000);
+    uint16_t r = (uint16_t)(ms%1000);
+    digits[0]= s;
+    digits[1]= (uint8_t)(r/100);
+    digits[2]= (uint8_t)((r/10)%10);
+    digits[3]= (uint8_t)(r%10);
 }
 
-/* ms: 0..9999 -> s.mmm (dp en dígito 0) */
-void display7seg_set_s_mmm(uint16_t ms) {
-    if (ms > 9999) ms = 9999;
-    uint8_t s    = (uint8_t)(ms / 1000);       /* 0..9 */
-    uint16_t rem = (uint16_t)(ms % 1000);      /* 0..999 */
-    digits[0]    = s;
-    digits[1]    = (uint8_t)(rem / 100);
-    digits[2]    = (uint8_t)((rem / 10) % 10);
-    digits[3]    = (uint8_t)(rem % 10);
-    dp_mask      = 0b0001;                     /* DP en el dígito 0 => s.mmm */
-}
-
-void display7seg_refresh_once(void) {
+void display7seg_refresh_once(void){
     dig_all_off();
 
-    uint8_t d = digits[cur_digit];
-    if (d > 10) d = 10;
-    uint8_t pat = SEG_MAP_AC[d];
-    bool dp_on  = ((dp_mask >> cur_digit) & 0x01) != 0;
+    uint8_t d = (digits[cur_digit]<=10)?digits[cur_digit]:10;
+    seg_write(SEG_MAP[d]);
 
-    seg_write_raw(pat, dp_on);
+    // DP solo en el dígito 0 (s.mmm)
+    gpio_put(DP_PIN, (cur_digit == 0) ? SEG_ON : SEG_OFF);
+
     dig_on(cur_digit);
-
-    /* mantener ~1 ms para brillo */
-    sleep_us(HOLD_US);
-
-    cur_digit = (cur_digit + 1u) & 0x03;  /* 0..3 */
+    sleep_us(DISPLAY7SEG_HOLD_US);
+    cur_digit = (cur_digit+1u)&0x03;
 }
 
-void display7seg_show_ms_block(uint16_t ms, uint16_t hold_ms) {
+void display7seg_show_ms_block(uint16_t ms, uint16_t hold_ms){
     absolute_time_t t_end = make_timeout_time_ms(hold_ms);
     display7seg_set_s_mmm(ms);
-    while (absolute_time_diff_us(get_absolute_time(), t_end) > 0) {
+    while (absolute_time_diff_us(t_end, get_absolute_time()) > 0){
         display7seg_refresh_once();
     }
 }

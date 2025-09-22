@@ -1,15 +1,9 @@
-#pragma once
 #include <stdint.h>
 #include <pico/stdlib.h>
 
-/* Inicializa pines del display (ánodo común, 4 dígitos). */
+
 void display7seg_init(void);
-
-/* Carga el buffer con s.mmm a partir de ms (0..9999). */
-void display7seg_set_s_mmm(uint16_t ms);
-
-/* Refresca UN dígito (multiplexado). Llamar muy seguido en los bucles. */
-void display7seg_refresh_once(void);
-
-/* Muestra s.mmm de forma bloqueante durante hold_ms. */
-void display7seg_show_ms_block(uint16_t ms, uint16_t hold_ms);
+void display7seg_set_raw(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3); // 0..9, 10=blank
+void display7seg_set_s_mmm(uint16_t ms); // 0..9999 -> s.mmm
+void display7seg_refresh_once(void); // 1 dígito por llamada
+void display7seg_show_ms_block(uint16_t ms, uint16_t hold_ms); // bloqueante
