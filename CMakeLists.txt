@@ -38,7 +38,7 @@ pico_sdk_init()
 add_executable(Lab1 
     Lab1.c 
     lib/display7seg/display7seg.c
-    lib/debounce/debounce.c
+    # lib/debounce/debounce.c
 )
 
 pico_set_program_name(Lab1 "Lab1")
